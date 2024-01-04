@@ -63,7 +63,7 @@ class S3Client extends AWSClient
         if ($result['KeyCount'] === 0) {
             return [];
         }
-        $result = array_map(fn ($item) => ["link" => getenv('S3_PUBLIC_ENDPOINT')."/".getenv('S3_BUCKET')."/".$item['Key'], "id" => substr($item['Key'], strrpos($item['Key'], '/') + 1)], $result['Contents']);
+        $result = array_map(fn ($item) => ["link" => (getenv('S3_PUBLIC_ENDPOINT') ? getenv('S3_PUBLIC_ENDPOINT') : getenv('S3_ENDPOINT'))."/".getenv('S3_BUCKET')."/".$item['Key'], "id" => substr($item['Key'], strrpos($item['Key'], '/') + 1)], $result['Contents']);
 
         return $result;
     }
