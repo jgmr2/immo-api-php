@@ -7,6 +7,7 @@ use App\Utils\DBConnection;
 use Slim\Factory\AppFactory;
 use Dotenv\Exception\ValidationException;
 use Lukasoppermann\Httpstatus\Httpstatuscodes as Status;
+use Slim\Exception\HttpNotFoundException;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -39,6 +40,10 @@ try{
 } catch (\Exception $e) {
 }
 
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+  return $response;
+});
+
 $app->addBodyParsingMiddleware();
 $app->add(new CorsMiddleware());
 $app->addRoutingMiddleware();
@@ -48,9 +53,8 @@ $app->group('/api', function ($app) {
     require_once __DIR__ . '/../src/Routes/options.php';
 });
 
-$app->options('/{routes:.+}', function ($request, $response, $args) {
-  return $response;
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function ($request, $response) {
+  throw new HttpNotFoundException($request);
 });
-
 
 $app->run();
