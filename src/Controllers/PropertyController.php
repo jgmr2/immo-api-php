@@ -32,10 +32,13 @@ class PropertyController extends AppController
             $property->save();
             $property->options()->sync($data['options'] ?? null);
             $property->load('options');
-            if (isset($data['images'])) {
-                foreach ($data['images'] as $image) {
-                    $this->container->get('s3')->saveImage($image['link'], $image['id'], $property->id);
+            try{
+                if (isset($data['images'])) {
+                    foreach ($data['images'] as $image) {
+                        $this->container->get('s3')->saveImage($image['link'], $image['id'], $property->id);
+                    }
                 }
+            }catch(\Exception $e) {
             }
 
             return JsonWriter::success($response, Status::HTTP_OK, $property);
