@@ -4,6 +4,7 @@ use App\Middlewares\CorsMiddleware;
 use DI\Container;
 use Dotenv\Dotenv;
 use App\Utils\DBConnection;
+use App\Utils\JsonWriter;
 use Slim\Factory\AppFactory;
 use Dotenv\Exception\ValidationException;
 use Lukasoppermann\Httpstatus\Httpstatuscodes as Status;
@@ -39,6 +40,10 @@ try{
   $app->getContainer()->get('s3')->createBucketIfNotExists();
 } catch (\Exception $e) {
 }
+
+$app->get('/', function ($request, $response, $args) {
+  return JsonWriter::success($response, Status::HTTP_OK, ['message'=>'Hello World!']);
+});
 
 $app->options('/{routes:.+}', function ($request, $response, $args) {
   return $response;
