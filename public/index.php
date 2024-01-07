@@ -35,12 +35,6 @@ $app = AppFactory::create();
 require_once __DIR__ . '/../src/config/container.php';
 require_once __DIR__ . '/../src/config/error.php';
 
-// Create bucket if it doesn't exist
-try{
-  $app->getContainer()->get('s3')->createBucketIfNotExists();
-} catch (\Exception $e) {
-}
-
 $app->get('/', function ($request, $response, $args) {
   return JsonWriter::success($response, Status::HTTP_OK, ['message'=>'Hello World!']);
 });

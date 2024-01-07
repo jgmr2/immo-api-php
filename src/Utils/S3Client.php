@@ -21,15 +21,6 @@ class S3Client extends AWSClient
         ]);
     }
 
-    public function createBucketIfNotExists(): void
-    {
-        if (! $this->doesBucketExistV2(getenv('S3_BUCKET'))) {
-            $this->createBucket([
-              'Bucket' => getenv('S3_BUCKET'),
-            ]);
-        }
-    }
-
     public function saveImage($image, $image_id, $id): Result
     {
         $parts = explode(',', $image);
@@ -63,11 +54,7 @@ class S3Client extends AWSClient
         if ($result['KeyCount'] === 0) {
             return [];
         }
-        $result = array_map(function($item){
-          $getUrlCommand = $this->getCommand('GetObject', ['Bucket' => getenv('S3_BUCKET'), 'Key' => $item["Key"]]);
-          $url = $this->createPresignedRequest($getUrlCommand, '+1 hour')->getUri();
-          return ["link" => $url, "id" => substr($item['Key'], strrpos($item['Key'], '/') + 1)];
-        },$result['Contents']);
+        $result = array_map(fn ($item) => ["link" => (getenv('S3_PUBLIC_ENDPOINT') ? getenv('S3_PUBLIC_ENDPOINT') : getenv('S3_ENDPOINT'))."/".getenv('S3_BUCKET')."/".$item['Key'], "id" => substr($item['Key'], strrpos($item['Key'], '/') + 1)], $result['Contents']);
 
         return $result;
     }
